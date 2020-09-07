@@ -12,41 +12,21 @@ def process_code(code, shift)
     form = get_case_by_code(code)
     unless form == "n/a"
         code += shift
-        code = shift_code(code, form) until is_valid_char_code(code, form) 
+        code = force_valid_shift(code, form)
     end
     return code
 end
 
-def shift_code(code, form)
-    state = 'above'
-
+def force_valid_shift(code, form)
     case form
     when 'lower'
-        state = 'below' if code < get_code('a')
+        offset = get_code('a')
     when 'upper'
-        state = 'below' if code < get_code('A')
+        offset = get_code('A')
     end
 
-    if state == 'above' 
-        code - 26
-    else
-        code + 26
-    end
+    (code - offset) % 26 + offset
 end
-
-def get_code(char)
-    char.each_codepoint.first
-end
-
-def is_valid_char_code(code, form)
-    case form
-    when 'lower'
-        return true if is_lower_by_code(code)
-    when 'upper'
-        return true if is_upper_by_code(code)
-    end
-end
-
 
 def get_case_by_code(code)
     if is_lower_by_code(code)
@@ -64,4 +44,8 @@ end
 
 def is_upper_by_code(code)
     get_code('A') <= code && code <= get_code('Z')
+end
+
+def get_code(char)
+    char.each_codepoint.first
 end
